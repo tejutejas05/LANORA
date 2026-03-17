@@ -1,13 +1,8 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-import Message from './message'
-
+import ListGroup from "./components/ListGroup.tsx";
+import Events from "./components/Events.tsx";
 function App() {
    
-  return <div><Message/></div>
+  return <div><Events/> <ListGroup/></div>
 
   
 }
