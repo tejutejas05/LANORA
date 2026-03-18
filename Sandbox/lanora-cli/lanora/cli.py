@@ -9,7 +9,7 @@ def main():
 
     subparsers.add_parser("login", help="Login to Lanora") # For Login command
 
-    subparsers.add_parser("test", help="Test your AI Agent")
+    subparsers.add_parser("test", help="Test your AI Agent") # For testing the agent
 
     args = parser.parse_args()
 
@@ -23,5 +23,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-    
+
 
