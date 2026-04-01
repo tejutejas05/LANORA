@@ -183,8 +183,3 @@
   }
 }
 
-.dashboard{
-  display: grid;
-  align-items: center;
-  border: 5px solid white;
-}
