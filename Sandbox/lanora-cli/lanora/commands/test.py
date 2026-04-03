@@ -4,30 +4,33 @@ import zipfile
 def run_test():
     print("Running the Lanora Test.....")
 
+    # here the path will be detected 
     project_path = os.getcwd()
-    print(f"Project detected: {project_path}")
+    print(f"Project detected: {project_path}") # path will be displayed
 
+    # checks the main.py in the folder structure
     main_file = os.path.join(project_path, "main.py")
     if not os.path.exists(main_file):
         print("Error: main.py not found in this directory")
         return
 
-    
+    # the folder name will be taken from the path to create the zipfile name 
     folder_name = os.path.basename(project_path)
 
-
+    # zip name creation 
     zip_name = f"{folder_name}.zip"
     print("Creating the Zip...")
 
-
+    #here it will ignore the files below mentioned
     ignore = [".git", "__pycache__", ".venv", ".env"]
 
-    with zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED) as zipf:  #write the zip file
 
         for root, dirs, files in os.walk(project_path):
 
             dirs[:] = [d for d in dirs if d not in ignore]
 
+            #checks through the folder and make the zip
             for file in files:
                 file_path = os.path.join(root,file)
 
