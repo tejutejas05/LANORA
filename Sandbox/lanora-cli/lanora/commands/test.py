@@ -7,7 +7,7 @@ def run_test():
     project_path = os.getcwd()
     print(f"Project detected: {project_path}")
 
-    main_file - os.path.join(project_path, "main.py")
+    main_file = os.path.join(project_path, "main.py")
     if not os.path.exists(main_file):
         print("Error: main.py not found in this directory")
         return
@@ -16,7 +16,7 @@ def run_test():
     folder_name = os.path.basename(project_path)
 
 
-    zip_name = f"{folder_name}".zip_name
+    zip_name = f"{folder_name}.zip"
     print("Creating the Zip...")
 
 
@@ -39,4 +39,4 @@ def run_test():
 
     print(f"Zip created successfully: {zip_name}")
 
-    
+
