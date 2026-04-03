@@ -1,17 +1,42 @@
 import os
+import zipfile
 
 def run_test():
-    print(" Running Lanora Test...")
+    print("Running the Lanora Test.....")
 
-    # Check if main.py exists
-    if not os.path.exists("main.py"):
-        print(" Error: main.py not found in current directory")
+    project_path = os.getcwd()
+    print(f"Project detected: {project_path}")
+
+    main_file = os.path.join(project_path, "main.py")
+    if not os.path.exists(main_file):
+        print("Error: main.py not found in this directory")
         return
 
-    print("Found main.py")
+    
+    folder_name = os.path.basename(project_path)
 
-    # Simulate execution
-    print(" Executing agent...")
-    os.system("python main.py")
 
-    print("Test completed!")
+    zip_name = f"{folder_name}.zip"
+    print("Creating the Zip...")
+
+
+    ignore = [".git", "__pycache__", ".venv", ".env"]
+
+    with zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED) as zipf:
+
+        for root, dirs, files in os.walk(project_path):
+
+            dirs[:] = [d for d in dirs if d not in ignore]
+
+            for file in files:
+                file_path = os.path.join(root,file)
+
+                relative_path = os.path.relpath(file_path, project_path)
+
+                arcname = os.path.join(folder_name, relative_path)
+
+                zipf.write(file_path, arcname)
+
+    print(f"Zip created successfully: {zip_name}")
+
+
