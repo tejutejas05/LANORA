@@ -1,20 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-import './home/Navbar'
-import {Navbar} from './home/Navbar'
+import { useState } from "react";
+import Dashboard from "./pages/Dashboard";
+import Sidebar from "./components/Sidebar";
+import Card from "./components/Card";
+import Navbar from "./components/Navbar";
+import Settings from "./pages/Settings";
+import Users from "./pages/Users"
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [open, setOpen] = useState(true);
 
   return (
     <>
-     <h1>dashboard</h1>
-      <Navbar/>
+      <BrowserRouter>
+        <div className="flex ">
+          <Sidebar />
+
+          <div className="flex-1 flex flex-col">
+            <Navbar />
+
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/Users" element= {<Users/>} /> 
+            </Routes>
+          </div>
+        </div>
+      </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
