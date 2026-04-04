@@ -1,9 +1,12 @@
 import os
 import zipfile
 import requests # for the http requests to backend
+from lanora.utils import require_auth
 
 
+@require_auth
 def run_test():
+
     print("Running the Lanora Test.....")
 
     # here the path will be detected 
