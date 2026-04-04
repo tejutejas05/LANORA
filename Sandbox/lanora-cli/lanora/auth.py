@@ -4,6 +4,10 @@ import os
 
 CONFIG_PATH = os.path.expanduser("~/.lanora_config.json")
 
+def register():
+    print("For register please do visit for this website")
+
+
 def login():
     print("Lanora Login")
 

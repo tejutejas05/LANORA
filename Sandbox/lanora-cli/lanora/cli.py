@@ -1,5 +1,5 @@
 import argparse
-from lanora.auth import login 
+from lanora.auth import login, register
 from lanora.commands.test import run_test
 
 def main():
