@@ -1,7 +1,7 @@
 import os
 import zipfile
 import requests # for the http requests to backend
-from utils import require_auth
+from lanora.utils import require_auth
 
 
 @require_auth

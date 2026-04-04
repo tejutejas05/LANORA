@@ -1,6 +1,7 @@
 import argparse
 from lanora.auth import login, register, logout
 from lanora.commands.test import run_test
+import sys
 
 public_commands = ["login", "register"]
 

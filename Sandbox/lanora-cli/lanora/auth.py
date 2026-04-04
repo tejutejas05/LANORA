@@ -1,6 +1,6 @@
 import requests
 import webbrowser
-from config import save_session, clear_session
+from lanora.config import save_session, clear_session
 
 API_URL = "http://localhost:8080"
 
@@ -38,4 +38,3 @@ def logout():
     clear_session()
     print("logged out")
 
-    
