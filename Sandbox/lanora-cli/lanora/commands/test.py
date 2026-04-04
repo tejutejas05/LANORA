@@ -1,5 +1,7 @@
 import os
 import zipfile
+import requests
+
 
 def run_test():
     print("Running the Lanora Test.....")
@@ -42,4 +44,22 @@ def run_test():
 
     print(f"Zip created successfully: {zip_name}")
 
+    print("file sending to backend")
 
+    url = "http://localhost:8080/test-agent"
+
+    try:
+        with open(zip_name, "rb") as f: # open zip file
+            files = {"file": f}
+
+            response = requests.post(url, files=files) # http request 
+
+        print("Response from server:")
+        print(response.text)
+    
+    # if fails this works
+    except Exception as e: 
+        print("Failed to connect")
+        print(e)
+
+ 
