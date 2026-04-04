@@ -1,6 +1,6 @@
 import os
 import zipfile
-import requests
+import requests # for the http requests to backend
 
 
 def run_test():
