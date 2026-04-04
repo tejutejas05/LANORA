@@ -1,28 +1,41 @@
-import json 
+import requests
+import webbrowser
+from config import save_session, clear_session
 
-import os
-
-CONFIG_PATH = os.path.expanduser("~/.lanora_config.json")
+API_URL = "http://localhost:8080"
 
 def register():
-    print("For register please do visit for this website")
-
+    print("Opening the browser for the registration...")
+    webbrowser.open("http://localhost:5173")
+    
 
 def login():
-    print("Lanora Login")
+   # print("Lanora Login")
 
     email = input("enter your email : ")
     password = input("enter your password : ")
 
+    try:
+        res = requests.post(f"{API_URL}/login", json={
+            "email": email,
+            "password": password
+        })
 
-    token = "dummy_token_123"
+        if res.status_code == 200:
+            data = res.json()
+            token = data.get("token")
 
-    save_config({"token": token})
+            save_session(token, email)
+            print("Logged success")
 
-    print("Login Successful")
+        else:
+            print(" invaild details")
 
+    except Exception as e:
+        print("error:", e)
 
-def save_config(data):
-    with open(CONFIG_PATH, "w") as f:
-        json.dump(data, f)
-        
+def logout():
+    clear_session()
+    print("logged out")
+
+    
