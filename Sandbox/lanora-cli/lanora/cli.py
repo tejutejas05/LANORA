@@ -1,27 +1,35 @@
 import argparse
-from lanora.auth import login, register
+from lanora.auth import login, register, logout
 from lanora.commands.test import run_test
 
+public_commands = ["login", "register"]
+
 def main():
-    parser = argparse.ArgumentParser(prog="lanora", description = "Lanora CLI")
+    if len(sys.argv) < 2:
+        print("Usage: lanora <command>")
+        return
 
-    subparsers = parser.add_subparsers(dest="command")
+    cmd = sys.argv[1]
 
-    subparsers.add_parser("login", help="Login to Lanora") # For Login command
+    if cmd == "register":
+        register()
 
-    subparsers.add_parser("test", help="Test your AI Agent") # For testing the agent
-
-    args = parser.parse_args()
-
-    if args.command == "login":
+    elif cmd == "login":
         login()
-    elif args.command == "test":
-        run_test()
+
+    elif cmd == "logout":
+        logout()
+
+    elif cmd == "test":
+        test.run()
+
+    elif cmd == "deploy":
+        deploy.run()
+
     else:
-        parser.print_help()
+        print("Unknown command")
+
 
 if __name__ == "__main__":
     main()
-
-
-
+    
