@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Settings from "./pages/Settings";
 import Users from "./pages/Users"
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Resource_Usage from "./pages/Resource_Usage";
 
 function App() {
   const [open, setOpen] = useState(true);
@@ -22,7 +23,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="/Users" element= {<Users/>} /> 
+              <Route path="/Users" element= {<Users/>} />
+              <Route path="/Resource Usage" element={<Resource_Usage/>} /> 
             </Routes>
           </div>
         </div>
