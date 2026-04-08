@@ -17,17 +17,17 @@ function Dashboard() {
 
       <div className="bg-gray-900 p-6 rounded-xl mb-6">
         <h3 className="text-lg font-semibold mb-4">Recent Tests</h3>
-        <ul className="">
-          <li className="text-lg font-semibold mb-3 ">Agent ID</li>
-          <li className="text-lg font-semibold mb-3 ">Status</li>
-          <li className="text-lg font-semibold mb-3 ">created at</li>
-          <li className="text-lg font-semibold mb-3 ">Runtime</li>
+        <ul className="grid grid-cols-4 gap-90 text-gray-400 mb-3">
+          <li >Agent ID</li>
+          <li >Status</li>
+          <li >created at</li>
+          <li >Runtime</li>
         </ul>
         
         {data.recentTests.map((test) => (
           <div
             key={test.id}
-            className="flex justify-between items-center border border-gray-700 p-3 rounded mb-2"
+            className="flex gap-4 justify-between items-center border border-gray-700 p-3 rounded mb-2"
           >
             <span>{test.agent}</span>
             <span>{test.status}</span>

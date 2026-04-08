@@ -13,7 +13,7 @@ function Sidebar(){
                    </Link>
                  </li>
                 <li > 
-                    < Link to= "/Sand Boxes" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
+                    < Link to= "/Sandboxes" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
                     <FaBox/>Sandboxes
                     </Link>
                 </li>
