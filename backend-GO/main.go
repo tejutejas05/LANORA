@@ -1,22 +1,25 @@
 package main
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"lanora-backend/database"
-	
+	"lanora-backend/handlers"
 )
 
-func main(){
+func main() {
+
 	database.Connect()
 
+	// test route
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Server is running")
+		fmt.Fprintln(w, "Server is running ")
 	})
 
-	fmt.Println("Server started at :8080")
-	http.ListenAndServe(":8080", nil)
+	//  IMPORTANT ROUTE
+	http.HandleFunc("/auth/register", handlers.Register)
 
+	fmt.Println("Server started at :5000")
+	http.ListenAndServe(":5000", nil)
 }
-
