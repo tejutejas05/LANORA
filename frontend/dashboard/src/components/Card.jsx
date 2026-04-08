@@ -1,11 +1,10 @@
-import React from 'react'
-
-const Card = ({title}) => {
+function Card({ title, value }) {
   return (
-    <div className='bg-white p-5 rounded-xl shadow hover:shadow-lg transition'>
-        <h3 className='text-xl font-semibold'>{title}</h3>
+    <div className="bg-gray-900 p-5 rounded-xl shadow">
+      <h3 className="text-gray-400">{title}</h3>
+      <p className="text-xl font-bold mt-2">{value}</p>
     </div>
-  )
+  );
 }
 
 export default Card;

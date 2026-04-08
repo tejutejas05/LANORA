@@ -1,12 +1,14 @@
 import { useState } from "react";
 import Dashboard from "./pages/Dashboard";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./pages/Sidebar";
 import Card from "./components/Card";
 import Navbar from "./components/Navbar";
 import Settings from "./pages/Settings";
-import Users from "./pages/Users"
+import Users from "./components/Sandboxes"
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import Resource_Usage from "./pages/Resource_Usage";
+import Resource_Usage from "./components/Resource_Usage";
+import Test_History from "./components/Test_History";
+import Sandboxes from "./components/Sandboxes";
 
 function App() {
   const [open, setOpen] = useState(true);
@@ -21,10 +23,11 @@ function App() {
             <Navbar />
 
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/Dashboard" element={<Dashboard />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="/Users" element= {<Users/>} />
+              <Route path="/Sandboxes" element= {<Sandboxes/>} />
               <Route path="/Resource Usage" element={<Resource_Usage/>} /> 
+              <Route path="/Test History" element={<Test_History/>} />
             </Routes>
           </div>
         </div>

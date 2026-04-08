@@ -1,4 +1,4 @@
-function Users(){
+function Sandboxes(){
     return(
         <div className="p-5">
             <h1 className="text-2xl font-bold">Users page</h1>
@@ -6,4 +6,4 @@ function Users(){
     )
 }
 
-export default Users;
+export default Sandboxes;
