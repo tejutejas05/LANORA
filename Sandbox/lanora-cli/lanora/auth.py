@@ -2,11 +2,11 @@ import requests
 import webbrowser
 from lanora.config import save_session, clear_session
 
-API_URL = "http://localhost:8080"
+API_URL = "http://localhost:8080" # jev
 
 def register():
     print("Opening the browser for the registration...")
-    webbrowser.open("http://localhost:5173")
+    webbrowser.open("http://localhost:5173") ## Prashanth
     
 
 def login():
