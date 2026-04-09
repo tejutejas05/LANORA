@@ -19,7 +19,7 @@ func run(w http.ResponseWriter, r *http.Request) {
 func home(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprint(w, "This is home page")
 	http.ServeFile(w, r, "test_ui/html/form.html")
-	// r.ParseMultipartForm()
+	r.ParseMultipartForm()
 }
 
 func main() {
