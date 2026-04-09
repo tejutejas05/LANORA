@@ -64,3 +64,4 @@ def run_test():
     except Exception as e: 
         print("Failed to connect")
         print(e)
+    
