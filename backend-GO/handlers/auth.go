@@ -38,16 +38,27 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// insert into DB
-	_, err = database.DB.Exec(
+	
+	
+	result, err := database.DB.Exec(
 		"INSERT INTO users (email, password) VALUES ($1, $2)",
 		req.Email,
 		string(hashedPassword),
 	)
 
 	if err != nil {
-		http.Error(w, "user already exists", 400)
+		fmt.Println("DB ERROR:", err)
+		http.Error(w, err.Error(), 400)
 		return 
 	}
+
+	rows, err := result.RowsAffected()
+
+	if err != nil {
+		fmt.Println("rows error:", err)
+	}
+	
+	fmt.Println("Rows inserted:", rows)
 
 	w.Write([]byte("User registered successfully"))
 
