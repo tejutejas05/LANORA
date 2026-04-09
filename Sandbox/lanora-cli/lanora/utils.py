@@ -1,11 +1,15 @@
-from lanora.config import is_logged_in
+from lanora.config import get_token
 
 def require_auth(func):
     def wrapper(*args, **kwargs):
-        if not is_logged_in():
+        token = get_token()
+
+        if not token:
             print("\n You are not logged in.")
             print("Run: Lanora login\n")
             return
-        return func(*args, **kwargs)
+        
+        return func(token, *args, **kwargs)
+    
     return wrapper
 
