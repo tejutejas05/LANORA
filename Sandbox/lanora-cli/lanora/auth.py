@@ -2,7 +2,7 @@ import requests
 import webbrowser
 from lanora.config import save_session, clear_session
 
-API_URL = "http://localhost:8080" # jev
+API_URL = "http://localhost:5000" # jev
 
 def register():
     print("Opening the browser for the registration...")
@@ -16,7 +16,7 @@ def login():
     password = input("enter your password : ")
 
     try:
-        res = requests.post(f"{API_URL}/login", json={
+        res = requests.post(f"{API_URL}/auth/login", json={
             "email": email,
             "password": password
         })
