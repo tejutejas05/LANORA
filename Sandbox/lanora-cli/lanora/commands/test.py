@@ -5,7 +5,7 @@ from lanora.utils import require_auth
 
 
 @require_auth
-def run_test():
+def run_test(token):
 
     print("Running the Lanora Test.....")
 
@@ -49,13 +49,18 @@ def run_test():
 
     print("file sending to backend")
 
-    url = "http://localhost:8080/test-agent"
+    url = "http://localhost:5000/test-agent"
 
     try:
         with open(zip_name, "rb") as f: # open zip file
             files = {"file": f}
 
-            response = requests.post(url, files=files) # http request 
+            #new line code for token auth(jwt)
+            headers = {
+                "Authorization":f"Bearer {token}"
+            }
+
+            response = requests.post(url, files=files, headers=headers) # http request 
 
         print("Response from server:")
         print(response.text)
