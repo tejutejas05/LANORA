@@ -22,10 +22,10 @@ def main():
         logout()
 
     elif cmd == "test":
-        test.run()
+        run_test()
 
-    elif cmd == "deploy":
-        deploy.run()
+    #elif cmd == "deploy":
+    #   deploy.run()
 
     else:
         print("Unknown command")
