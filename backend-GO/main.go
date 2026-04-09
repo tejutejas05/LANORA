@@ -19,6 +19,7 @@ func main() {
 
 	//  IMPORTANT ROUTE
 	http.HandleFunc("/auth/register", handlers.Register)
+	http.HandleFunc("/auth/login", handlers.Login)
 
 	fmt.Println("Server started at :5000")
 	http.ListenAndServe(":5000", nil)
