@@ -17,6 +17,8 @@ func main() {
 		fmt.Fprintln(w, "Server is running ")
 	})
 
+	http.HandleFunc("/test-agent",handlers.TestAgent)
+
 	//  IMPORTANT ROUTE
 	http.HandleFunc("/auth/register", handlers.Register)
 	http.HandleFunc("/auth/login", handlers.Login)
