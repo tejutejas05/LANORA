@@ -1,17 +1,72 @@
 import os
+import zipfile
+import requests # for the http requests to backend
+from lanora.utils import require_auth
 
-def run_test():
-    print(" Running Lanora Test...")
 
-    # Check if main.py exists
-    if not os.path.exists("main.py"):
-        print(" Error: main.py not found in current directory")
+@require_auth
+def run_test(token):
+
+    print("Running the Lanora Test.....")
+
+    # here the path will be detected 
+    project_path = os.getcwd()
+    print(f"Project detected: {project_path}") # path will be displayed
+
+    # checks the main.py in the folder structure
+    main_file = os.path.join(project_path, "main.py")
+    if not os.path.exists(main_file):
+        print("Error: main.py not found in this directory")
         return
 
-    print("Found main.py")
+    # the folder name will be taken from the path to create the zipfile name 
+    folder_name = os.path.basename(project_path)
 
-    # Simulate execution
-    print(" Executing agent...")
-    os.system("python main.py")
+    # zip name creation 
+    zip_name = f"{folder_name}.zip"
+    print("Creating the Zip...")
 
-    print("Test completed!")
+    #here it will ignore the files below mentioned
+    ignore = [".git", "__pycache__", ".venv", ".env"]
+
+    with zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED) as zipf:  #write the zip file
+
+        for root, dirs, files in os.walk(project_path):
+
+            dirs[:] = [d for d in dirs if d not in ignore]
+
+            #checks through the folder and make the zip
+            for file in files:
+                file_path = os.path.join(root,file)
+
+                relative_path = os.path.relpath(file_path, project_path)
+
+                arcname = os.path.join(folder_name, relative_path)
+
+                zipf.write(file_path, arcname)
+
+    print(f"Zip created successfully: {zip_name}")
+
+    print("file sending to backend")
+
+    url = "http://localhost:5000/test-agent"
+
+    try:
+        with open(zip_name, "rb") as f: # open zip file
+            files = {"file": f}
+
+            #new line code for token auth(jwt)
+            headers = {
+                "Authorization":f"Bearer {token}"
+            }
+
+            response = requests.post(url, files=files, headers=headers) # http request 
+
+        print("Response from server:")
+        print(response.text)
+    
+    # if fails this works
+    except Exception as e: 
+        print("Failed to connect")
+        print(e)
+    
