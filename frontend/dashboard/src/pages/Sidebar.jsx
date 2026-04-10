@@ -1,8 +1,9 @@
-import {FaHome,FaBox,FaCog,FaChartLine,FaHistory} from  "react-icons/fa"
+import {FaHome,FaBox,FaCog,FaChartLine,FaHistory,FaBell,FaUserCircle} from  "react-icons/fa"
 import { Link,NavLink } from "react-router-dom";
 
 function Sidebar(){
     return(
+       <>
         <div className="w-65 bg-gray-400 p-4 text-black min-h-screen flex flex-col ">
             <h1 className="text-xl font-bold mb-6 ">(logo)LANORA</h1>
 
@@ -34,6 +35,7 @@ function Sidebar(){
                 </li>
             </ul>
         </div>
+    </>
     );
 }
 

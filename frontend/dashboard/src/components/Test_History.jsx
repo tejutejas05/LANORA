@@ -1,36 +1,23 @@
 import Card from "./Card";
 import { mockData } from "../data/mockData";
+import Table from "./Table";
 
-function Test_History(){
-    const data = mockData.testHistory;
+function Test_History() {
+  const data = mockData.testHistory;
+  const columns=[
+    {label:"Agent", key:"agent"},
+    {label:"Status", key:"status"},
+    {label:"Created At", key:"createdAt"},
+    {label:"Runtime", key:"runtime"},
+    
+  ]
 
-    return(
-         <div className="bg-gray-900 p-6 rounded-xl mb-6">
-            <h3 className="text-lg font-semibold mb-4">Test History</h3>
-
-            <ul className="grid grid-cols-4 gap-90 text-gray-400 mb-3 ">
-                <li>Agent ID</li>
-                <li>Status</li>
-                <li>Created At</li>
-                <li>Runtime</li>
-            </ul>
-            {data.testHistory.map((test)=>{
-                <div
-                    key={test.id}
-                    className="flex gap-4 justify-between items-center border border-gray-700 p-3 rounded mb-2"
-                >
-                <span>{test.agent}</span>
-                <span>{test.status}</span>
-                <span>{test.createdAt}</span>
-                <span>{test.runtime}</span>
-
-                <button className="border px-3 py-1 rounded ">view full logs
-
-                </button>
-                </div>
-            })}
-        </div>
-    );
+  return (
+    <div className="p-6 bg-black text-white min-h-screen">
+      <h2 className="text-2xl font-bold mb-6">Test History</h2>
+         <Table columns={columns} data={data.tests}/>
+    </div>
+  );
 }
 
 export default Test_History;
