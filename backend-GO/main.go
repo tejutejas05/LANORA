@@ -6,6 +6,8 @@ import (
 
 	"lanora-backend/database"
 	"lanora-backend/handlers"
+	"lanora-backend/middleware"
+
 )
 
 func main() {
@@ -16,6 +18,8 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Server is running ")
 	})
+
+	http.HandleFunc("/test-agent", middleware.VerifyJWT(handlers.TestAgent))
 
 	//  IMPORTANT ROUTE
 	http.HandleFunc("/auth/register", handlers.Register)

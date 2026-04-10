@@ -12,8 +12,8 @@ def register():
 def login():
    # print("Lanora Login")
 
-    email = input("enter your email : ")
-    password = input("enter your password : ")
+    email = input("enter your email : ").strip()
+    password = input("enter your password : ").strip()
 
     try:
         res = requests.post(f"{API_URL}/auth/login", json={
@@ -21,15 +21,23 @@ def login():
             "password": password
         })
 
-        if res.status_code == 200:
-            data = res.json()
-            token = data.get("token")
+        if res.status_code != 200:
+            print(f"Login Failed: {res.text}")
+            return
+        
+        data = res.json()
+        token = data.get("token")
 
-            save_session(token, email)
-            print("Logged success")
+        if not token:
+            print("No token received from the server")
+            return 
+        
+        save_session(token, email)
 
-        else:
-            print(" invaild details")
+        print("Logged successfully")
+
+    except requests.exceptions.ConnectionError:
+        print("Cannot connect the backend. Is server running?")
 
     except Exception as e:
         print("error:", e)
