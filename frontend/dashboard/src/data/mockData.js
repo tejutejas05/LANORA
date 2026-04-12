@@ -10,13 +10,15 @@ export const mockData = {
         id: 1,
         agent: "agent1.hfosi.duofhdsfh.py",
         status: "Running",
-        createdAt: "19/02/2026 19:20:00"
+        createdAt: "19/02/2026 19:20:00",
+         runtime: "25:52:21"
       },
       {
         id: 2,
         agent: "agent1.hfosi.duofhdsfh.py",
         status: "Terminated",
-        createdAt: "19/02/2026 19:20:00"
+        createdAt: "19/02/2026 19:20:00",
+         runtime: "23:51:31"
       }
     ],
     storage: "34 GB",
