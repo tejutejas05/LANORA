@@ -1,10 +1,8 @@
 import { useState } from "react";
 import Dashboard from "./pages/Dashboard";
 import Sidebar from "./pages/Sidebar";
-import Card from "./components/Card";
 import Navbar from "./components/Navbar";
 import Settings from "./pages/Settings";
-import Users from "./components/Sandboxes"
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Resource_Usage from "./components/Resource_Usage";
 import Test_History from "./components/Test_History";
