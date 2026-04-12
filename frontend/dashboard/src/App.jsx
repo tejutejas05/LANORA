@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Resource_Usage from "./components/Resource_Usage";
 import Test_History from "./components/Test_History";
 import Sandboxes from "./components/Sandboxes";
+import Register from "./pages/Register";
 
 function App() {
   const [open, setOpen] = useState(true);
@@ -26,6 +27,7 @@ function App() {
               <Route path="/Sandboxes" element= {<Sandboxes/>} />
               <Route path="/Resource Usage" element={<Resource_Usage/>} /> 
               <Route path="/Test History" element={<Test_History/>} />
+              <Route path="/Register" element={<Register/>} />
             </Routes>
           </div>
         </div>
