@@ -5,6 +5,11 @@ import(
 	"io"
 	"net/http"
 	"os"
+	"encoding/json"
+
+	"lanora-backend/models"
+	"lanora-backend/services"
+
 )
 
 func TestAgent(w http.ResponseWriter, r *http.Request) {
@@ -31,6 +36,32 @@ func TestAgent(w http.ResponseWriter, r *http.Request) {
 	io.Copy(out, file)
 
 	fmt.Println("File saved successfully!!")
-
-	
 }
+
+// func TestAgentHandler(w http.ResponseWriter, r *http.Request) {
+	
+// 	var req models.TestAgentRequest
+
+// 	err := json.NewDecoder(r.Body).Decode(&req)
+// 	if err != nil {
+// 		http.Error(w, "Invalid request", http.StatusBadRequest)
+// 		return
+// 	}
+
+// 	logs, err := map[string]interface{}{}
+
+// 	if err != nil {
+// 		response["status"] = "error"
+// 		response["error"] = err.Error()
+// 	}
+// 	else{
+// 		response["status"] = "success"
+// 		response["logs"] = logs
+// 	}
+
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(response)
+// }
+
+
+
