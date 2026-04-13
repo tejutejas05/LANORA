@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"lanora-backend/database"
-	//"lanora-backend/handlers"
+	"lanora-backend/handlers"
 	"lanora-backend/middleware"
 
 )
@@ -20,6 +20,7 @@ func main() {
 	})
 
 	http.HandleFunc("/test-agent", middleware.VerifyJWT(handlers.TestAgent))
+	// function for the test
 	http.HandleFunc("/run-agent", middleware.VerifyJWT(handlers.RunAgent))
 
 	//  IMPORTANT ROUTE
