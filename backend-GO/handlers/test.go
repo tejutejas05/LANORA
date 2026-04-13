@@ -63,5 +63,39 @@ func TestAgent(w http.ResponseWriter, r *http.Request) {
 // 	json.NewEncoder(w).Encode(response)
 // }
 
+//docker part
 
+func RunAgent(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return 
+	}
+
+	var req models.TestAgentRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+
+	if err != nil {
+		http.Error(w, "invalid Request", http.StatusBadRequest)
+		return
+	}
+
+	logs, err := services.RunDockerContainer(req.Image)
+
+	response := map[string]interface{}{}
+
+	if err != nil {
+		response["status"] = "error"
+		response["error"] = err.Error()
+	} else {
+		response["status"] = "success"
+		response["logs"] = logs
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+
+
+}
 
