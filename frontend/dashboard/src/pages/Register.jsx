@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 function Register(){
+    const Port="https://localhost:5000/register";
+
     const [form, setForm]=useState({
         email:"",
         password:"",
@@ -8,6 +10,7 @@ function Register(){
     });
 
     const [error, setError]=useState("");
+
     const [success, setSuccess]=useState("");
 
     const handleChange = (e) => {
@@ -17,56 +20,56 @@ function Register(){
         });
     };
 
-    // const handleSubmit =async (e)=>{      after connecting backend i need to uncomment this and  delete that mock waala
-    //     e.preventDefault();
-
-    //     if(form.password != form.confirmpasssword){
-    //         setError("incorrect Password")
-    //         return;
-    //     }
-    const handleSubmit = async (e) => {
+    const handleSubmit =async (e)=>{      
         e.preventDefault();
 
-        if (form.password !== form.confirmPassword) {
-            setError("Passwords do not match");
-            setSuccess("");
+        if(form.password != form.confirmPassword){
+            setError("incorrect Password")
             return;
         }
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
 
-
-            setError("");
-            setSuccess("Creating Account...");
-
-            setTimeout(() => {
-                console.log("Form submitted:", form); 
-                setSuccess("Account created successfully!");
-            }, 1000);
-        }
-
-    //     try {
-    //         const res =await fetch("https://localhost:8080/register",{
-    //             method:"post",
-    //             headers:{
-    //                 "content-Type" : "application/json"
-    //             },
-    //             body: JSON.stringify({
-    //                 email: form.email,
-    //                 password: form.password
-    //             })
-    //         });
-
-    //         const data=await res.json();
-
-    //         if (! res.ok){
-    //             setError(data.message || "Registration failed");
-    //             return;
-    //         }
-    //         setSuccess("Account created Successfully!");
-    //         setError("");
-    //     }catch(err){
-    //         setError("something went Wrong");
+    //     if (form.password !== form.confirmPassword) {
+    //         setError("Passwords do not match");
+    //         setSuccess("");
+    //         return;
     //     }
-    // };
+
+
+    //         setError("");
+    //         setSuccess("Creating Account...");
+
+    //         setTimeout(() => {
+    //             console.log("Form submitted:", form); 
+    //             setSuccess("Account created successfully!");
+    //         }, 1000);
+    //     }
+
+        try {
+            const res =await fetch(Port,{
+                method:"post",
+                headers:{
+                    "content-Type" : "application/json"
+                },
+                body: JSON.stringify({
+                    email: form.email,
+                    password: form.password
+                })
+            });
+
+            const data=await res.json();
+
+            if (! res.ok){
+                setError(data.message || "Registration failed");
+                return;
+            }
+            setSuccess("Account created Successfully!");
+            setError("");
+        }catch(err){
+            setError("something went Wrong");
+        }
+    };
 
     return(
         <div className="min-h-screen flex items-center justify-center bg-black text-white">
