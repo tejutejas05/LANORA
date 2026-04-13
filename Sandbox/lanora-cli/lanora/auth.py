@@ -6,7 +6,7 @@ API_URL = "http://localhost:5000" # jev
 
 def register():
     print("Opening the browser for the registration...")
-    webbrowser.open("http://localhost:5173") ## Prashanth
+    webbrowser.open("http://localhost:5173/register") ## Prashanth
     
 
 def login():
