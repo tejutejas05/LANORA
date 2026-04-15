@@ -22,12 +22,13 @@ function App() {
             <Navbar />
 
             <Routes>
-              <Route path="/Dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="/Sandboxes" element= {<Sandboxes/>} />
-              <Route path="/Resource Usage" element={<Resource_Usage/>} /> 
-              <Route path="/Test History" element={<Test_History/>} />
-              <Route path="/Register" element={<Register/>} />
+              <Route path="/sandboxes" element= {<Sandboxes/>} />
+              <Route path="/resourceusage" element={<Resource_Usage/>} /> 
+              <Route path="/testhistory" element={<Test_History/>} />
+              
+         
             </Routes>
           </div>
         </div>
