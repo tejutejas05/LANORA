@@ -6,7 +6,7 @@ import(
 	"net/http"
 	"os"
 	"encoding/json"
-
+	"path/filepath"
 	"lanora-backend/models"
 	"lanora-backend/services"
 
@@ -16,26 +16,78 @@ func TestAgent(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("/test-agent hit")
 
+	// file, handler, err := r.FormFile("file")
+	// if err != nil {
+	// 	http.Error(w, "File not recevied", 400)
+	// 	return
+	// }
+	// defer file.Close()
+
+	// fmt.Println("file recevied:", handler.Filename)
+
+	// // save file locally for temp
+	// out, err := os.Create(handler.Filename)
+	// if err != nil{
+	// 	http.Error(w, "Cannot save file", 500)
+	// 	return 
+	// }
+	// defer out.Close()
+
+	// io.Copy(out, file)
+
+	// Allowson,y the post request
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// file upload part
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w,"cannot parse form", http.StatusBadRequest)
+		return
+	}
+
 	file, handler, err := r.FormFile("file")
 	if err != nil {
-		http.Error(w, "File not recevied", 400)
+		http.Error(w, "File not recevied", http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
+	
+	fmt.Println("File received:", handler.Filename)
 
-	fmt.Println("file recevied:", handler.Filename)
+	uploadDir := "uploads"
+	os.MkdirAll(uploadDir, os.ModePerm)
 
-	// save file locally for temp
-	out, err := os.Create(handler.Filename)
-	if err != nil{
-		http.Error(w, "Cannot save file", 500)
-		return 
+
+	filePath := filepath.Join(uploadDir, handler.Filename)
+
+	out, err := os.Create(filePath)
+	if err != nil {
+		http.Error(w, "Cannot save file", http.StatusInternalServerError)
+		return
 	}
 	defer out.Close()
 
-	io.Copy(out, file)
+	_, err = io.Copy(out, file)
+	if err != nil {
+		http.Error(w,"Failes to save file", http.StatusInternalServerError)
+		return
+	}
 
-	fmt.Println("File saved successfully!!")
+	fmt.Println("File saved at:", filePath)
+
+	//sending the response
+	response := map[string]string {
+		"status": "success",
+		"message": "File uploaded successfully",
+		"path": filePath,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+
 }
 
 // func TestAgentHandler(w http.ResponseWriter, r *http.Request) {
