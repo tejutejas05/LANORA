@@ -57,6 +57,8 @@ func TestAgent(w http.ResponseWriter, r *http.Request) {
 	
 	fmt.Println("File received:", handler.Filename)
 
+	// here we create a uploads folder and store the zip inside it.....
+
 	uploadDir := "uploads"
 	os.MkdirAll(uploadDir, os.ModePerm)
 
