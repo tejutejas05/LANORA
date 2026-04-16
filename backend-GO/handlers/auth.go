@@ -18,7 +18,7 @@ import (
 
 // request strucute
 
-type RegsiterRequest struct {
+type RegisterRequest struct {
 	Email string `json:"email"`
 	Password string `json:"password"`
 }
@@ -28,18 +28,35 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+// Register Part
+
+
 func Register(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("register API hit")
 
-	var req RegsiterRequest
+	if r.Method != http.MethodPost {
+		http.Error(w,"Method not allowed", 405)
+		return
+	}
+
+	var req RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
+	
+	fmt.Println("Received Email:", req.Email)
+	fmt.Println("Received Password:", req.Password)
+
 	if err != nil {
 	fmt.Println("Decode error:", err)
 	http.Error(w, "Invalid JSON", 400)
 	return
 }
+
+	if req.Email == "" || req.Password == "" {
+		http.Error(w, "Missing fields", 400)
+		return
+	}
 
 	//hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
@@ -49,13 +66,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// insert into DB
-	
-	
-	result, err := database.DB.Exec(
+	_, err = database.DB.Exec(
 		"INSERT INTO users (email, password) VALUES ($1, $2)",
 		req.Email,
 		string(hashedPassword),
 	)
+	
 
 	if err != nil {
 		fmt.Println("DB ERROR:", err)
@@ -63,15 +79,17 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 
-	rows, err := result.RowsAffected()
+	// rows, err := result.RowsAffected()
+	// if err != nil {
+	// 	fmt.Println("rows error:", err)
+	// }
+	// fmt.Println("Rows inserted:", rows)
+	// w.Write([]byte("User registered successfully"))
 
-	if err != nil {
-		fmt.Println("rows error:", err)
-	}
-
-	fmt.Println("Rows inserted:", rows)
-
-	w.Write([]byte("User registered successfully"))
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "User registered successfully",
+	})
 
 
 }
@@ -121,10 +139,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := map[string]string{
+	// response := map[string]string{
+	// 	"token": tokenString,
+	// }
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
 		"token": tokenString,
-	}
-
-	json.NewEncoder(w).Encode(response) //sends the token to CLI/Postman
+	}) //sends the token to CLI/Postman
 
 }
