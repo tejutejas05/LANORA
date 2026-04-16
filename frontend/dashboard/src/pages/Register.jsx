@@ -1,12 +1,10 @@
 import { useState } from "react";
 
-function Register(){
-    const Port="https://localhost:5000/register";
+function Register({port}){
 
     const [form, setForm]=useState({
         email:"",
         password:"",
-        confirmPassword:""
     });
 
     const [error, setError]=useState("");
@@ -47,11 +45,12 @@ function Register(){
     //     }
 
         try {
-            const res =await fetch(Port,{
+            const res =await fetch(port,{
                 method:"post",
                 headers:{
-                    "content-Type" : "application/json"
+                    "Content-Type" : "application/json"
                 },
+                
                 body: JSON.stringify({
                     email: form.email,
                     password: form.password
@@ -111,23 +110,6 @@ function Register(){
                         </div>
                 </div>
 
-
-
-                <div>
-                <label className="text-sm text-gray-400">Confirm Password</label>
-
-                <div className="flex items-center border border-gray-600 rounded-lg mt-1 px-3">
-                    <input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder="Re-Enter the Password"
-                    value={form.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full p-3 bg-transparent outline-none"
-                    />
-                    
-                </div>
-                </div>
 
 
                 {error && <P className="text-red-400 text-sm">{error}</P>}

@@ -9,27 +9,27 @@ function Sidebar(){
 
             <ul className="space-y-4">
                 <li> 
-                < Link to= "/Dashboard" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
+                < Link to= "/dashboard" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
                     <FaHome/>Dashboard
                    </Link>
                  </li>
                 <li > 
-                    < Link to= "/Sandboxes" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
+                    < Link to= "/sandboxes" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
                     <FaBox/>Sandboxes
                     </Link>
                 </li>
                 <li>
-                    <Link to="/Settings" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
+                    <Link to="/settings" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
                     <FaCog/>Settings
                     </Link>
                 </li>
                 <li>
-                    <Link to="/Resource Usage" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer " >
+                    <Link to="/resourceusage" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer " >
                     <FaChartLine/>Resource Usage
                     </Link>
                 </li>
                 <li>
-                    <Link to="/Test History" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
+                    <Link to="/testhistory" className="flex items-center hover:text-blue-500 gap-2 cursor-pointer">
                     <FaHistory />Test History
                     </Link>
                 </li>
