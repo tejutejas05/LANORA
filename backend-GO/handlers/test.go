@@ -7,149 +7,101 @@ import(
 	"os"
 	"encoding/json"
 	"path/filepath"
-	"lanora-backend/models"
+	//"lanora-backend/models"
 	"lanora-backend/services"
 
 )
 
 func TestAgent(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("/test-agent hit")
-
-	// file, handler, err := r.FormFile("file")
-	// if err != nil {
-	// 	http.Error(w, "File not recevied", 400)
-	// 	return
-	// }
-	// defer file.Close()
-
-	// fmt.Println("file recevied:", handler.Filename)
-
-	// // save file locally for temp
-	// out, err := os.Create(handler.Filename)
-	// if err != nil{
-	// 	http.Error(w, "Cannot save file", 500)
-	// 	return 
-	// }
-	// defer out.Close()
-
-	// io.Copy(out, file)
-
-	// Allowson,y the post request
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// file upload part
+	fmt.Println("/test-agent hit")
+
+	//parse uploaded zip
+
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
-		http.Error(w,"cannot parse form", http.StatusBadRequest)
-		return
+		http.Error(w, "Cannot parse Form", http.StatusBadRequest)
+		return 
 	}
 
 	file, handler, err := r.FormFile("file")
 	if err != nil {
-		http.Error(w, "File not recevied", http.StatusBadRequest)
+		http.Error(w, "file not received", http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
-	
-	fmt.Println("File received:", handler.Filename)
 
-	// here we create a uploads folder and store the zip inside it.....
+	// save uploaded zip 
 
 	uploadDir := "uploads"
 	os.MkdirAll(uploadDir, os.ModePerm)
 
+	filePath := filepath.Join(
+		uploadDir,
+		handler.Filename,
+	)
 
-	filePath := filepath.Join(uploadDir, handler.Filename)
-
-	out, err := os.Create(filePath)
+	out , err := os.Create(filePath)
 	if err != nil {
-		http.Error(w, "Cannot save file", http.StatusInternalServerError)
+		http.Error(w, "cannot save the file", http.StatusInternalServerError)
 		return
 	}
 	defer out.Close()
 
 	_, err = io.Copy(out, file)
 	if err != nil {
-		http.Error(w,"Failes to save file", http.StatusInternalServerError)
+		http.Error(w, "failed to save the file", http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println("File saved at:", filePath)
+	fmt.Println("Zip saved at : ", filePath)
 
-	//sending the response
-	response := map[string]string {
-		"status": "success",
-		"message": "File uploaded successfully",
-		"path": filePath,
-	}
+	// --------------------------jev---------------------------------
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	imagename ,err := services.BuildDockerImage(filePath)
 
-}
+	if err != nil {
+		
+		response := map[string] interface{} {
+			"status": "error",
+			"stage": "build",
+			"error": err.Error(),
+		}
 
-// func TestAgentHandler(w http.ResponseWriter, r *http.Request) {
-	
-// 	var req models.TestAgentRequest
-
-// 	err := json.NewDecoder(r.Body).Decode(&req)
-// 	if err != nil {
-// 		http.Error(w, "Invalid request", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	logs, err := map[string]interface{}{}
-
-// 	if err != nil {
-// 		response["status"] = "error"
-// 		response["error"] = err.Error()
-// 	}
-// 	else{
-// 		response["status"] = "success"
-// 		response["logs"] = logs
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(response)
-// }
-
-//docker part
-
-func RunAgent(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(response)
 		return 
 	}
 
-	var req models.TestAgentRequest
+	//------------------------------------------------------------------------
 
-	err := json.NewDecoder(r.Body).Decode(&req)
 
-	if err != nil {
-		http.Error(w, "invalid Request", http.StatusBadRequest)
-		return
-	}
+	// here i will take the logs from the running container
 
-	logs, err := services.RunDockerContainer(req.Image)
+	logs, err := services.RunDockerContainer(imagename)
 
 	response := map[string]interface{}{}
 
 	if err != nil {
+
 		response["status"] = "error"
+		response["stage"] = "runtime"
 		response["error"] = err.Error()
+		response["logs"] = logs
 	} else {
 		response["status"] = "success"
 		response["logs"] = logs
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(
+		"Content-Type",
+		"application/json",
+	)
+
 	json.NewEncoder(w).Encode(response)
 
-
 }
-
