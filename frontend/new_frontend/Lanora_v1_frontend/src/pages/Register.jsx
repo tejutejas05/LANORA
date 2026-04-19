@@ -4,7 +4,7 @@ import { Terminal } from "lucide-react"
 
 export default function Register() {
 
-  const Port="https://localhost:5000/register";
+  const Port="http://localhost:5000/register";
 
   const [form, setForm]= useState({
     email:"",
@@ -22,7 +22,7 @@ export default function Register() {
   };
 
   const handleSubmit = async (e) => {
-    e.prevenDefault();
+    e.preventDefault();
 
     setError("");
     setSuccess("Creating your Account...");

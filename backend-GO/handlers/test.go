@@ -5,10 +5,10 @@ import(
 	"io"
 	"net/http"
 	"os"
-	"encoding/json"
+	//"encoding/json"
 	"path/filepath"
 	//"lanora-backend/models"
-	"lanora-backend/services"
+	//"lanora-backend/services"
 
 )
 
@@ -63,45 +63,45 @@ func TestAgent(w http.ResponseWriter, r *http.Request) {
 
 	// --------------------------jev---------------------------------
 
-	imagename ,err := services.BuildDockerImage(filePath)
+	// imagename ,err := services.BuildDockerImage(filePath)
 
-	if err != nil {
+	// if err != nil {
 		
-		response := map[string] interface{} {
-			"status": "error",
-			"stage": "build",
-			"error": err.Error(),
-		}
+	// 	response := map[string] interface{} {
+	// 		"status": "error",
+	// 		"stage": "build",
+	// 		"error": err.Error(),
+	// 	}
 
-		json.NewEncoder(w).Encode(response)
-		return 
-	}
+	// 	json.NewEncoder(w).Encode(response)
+	// 	return 
+	// }
 
 	//------------------------------------------------------------------------
 
 
 	// here i will take the logs from the running container
 
-	logs, err := services.RunDockerContainer(imagename)
+	// logs, err := services.RunDockerContainer(imagename)
 
-	response := map[string]interface{}{}
+	// response := map[string]interface{}{}
 
-	if err != nil {
+	// if err != nil {
 
-		response["status"] = "error"
-		response["stage"] = "runtime"
-		response["error"] = err.Error()
-		response["logs"] = logs
-	} else {
-		response["status"] = "success"
-		response["logs"] = logs
-	}
+	// 	response["status"] = "error"
+	// 	response["stage"] = "runtime"
+	// 	response["error"] = err.Error()
+	// 	response["logs"] = logs
+	// } else {
+	// 	response["status"] = "success"
+	// 	response["logs"] = logs
+	// }
 
-	w.Header().Set(
-		"Content-Type",
-		"application/json",
-	)
+	// w.Header().Set(
+	// 	"Content-Type",
+	// 	"application/json",
+	// )
 
-	json.NewEncoder(w).Encode(response)
+	// json.NewEncoder(w).Encode(response)
 
 }
