@@ -17,6 +17,7 @@ func enableCORS(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 		
@@ -42,5 +43,15 @@ func main() {
 	http.HandleFunc("/login", handlers.Login)
 
 	fmt.Println("Server started at :5000")
-	http.ListenAndServe(":5000", nil)
+	
+
+
+	//wraping default ServerMux with Cors
+	err := http.ListenAndServe(":5000", 
+		enableCORS(http.DefaultServeMux),
+	)
+	
+	if err != nil {
+		panic(err)
+	}
 }
