@@ -56,7 +56,6 @@ export default function Login() {
       if (!localStorage.getItem("joinDate")) {
         localStorage.setItem("joinDate", new Date().toISOString());
       }
-
       navigate("/dashboard");
     } catch(err){
       setError("server error");

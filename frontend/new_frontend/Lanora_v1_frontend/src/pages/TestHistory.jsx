@@ -1,24 +1,16 @@
 import { useState } from "react"
-import { Search, Filter, Loader2 } from "lucide-react"
+import { Search, Filter } from "lucide-react"
 import { useAppData } from "../hooks/useAppData"
 import RunTable from "../components/RunTable"
 
 export default function TestHistory() {
-  const { data, loading, error } = useAppData();
+  const { data, loading } = useAppData();
 
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("All")
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  if (loading) {
-    return <div className="flex-1 flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>;
-  }
-  
-  if (error || !data) {
-    return <div className="p-8 text-rose-500 text-sm">{error || "Failed to load history data."}</div>;
-  }
-
-  const allTests = data.testHistory.tests;
+  const allTests = data?.testHistory?.tests ?? [];
   // Filter logic
   const filteredTests = allTests.filter(test => {
     const matchesSearch = 
@@ -77,7 +69,13 @@ export default function TestHistory() {
          </div>
       </div>
       
-      <RunTable runs={filteredTests} />
+      {loading ? (
+        <div className="py-12 text-center border border-white/5 rounded-xl bg-white/[0.02]">
+           <p className="text-neutral-500 text-sm">Loading history...</p>
+        </div>
+      ) : (
+        <RunTable runs={filteredTests} />
+      )}
     </div>
   )
 }

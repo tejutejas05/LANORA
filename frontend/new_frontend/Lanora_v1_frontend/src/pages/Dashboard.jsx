@@ -1,21 +1,17 @@
-import { Activity, Box, CheckCircle2, Loader2 } from "lucide-react"
+import { Activity, Box, CheckCircle2 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useAppData } from "../hooks/useAppData"
 import StatCard from "../components/StatCard"
 import RunTable from "../components/RunTable"
 
 export default function Dashboard() {
-  const { data, loading, error } = useAppData();
+  const { data, loading } = useAppData();
 
-  if (loading) {
-    return <div className="flex-1 flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>;
-  }
-  
-  if (error || !data) {
-    return <div className="p-8 text-rose-500 text-sm">{error || "Failed to load dashboard data."}</div>;
-  }
-
-  const { stats, recentTests, storage, files } = data.dashboard;
+  // Safe fallback — cards always render with "--" when data is absent
+  const stats = data?.dashboard?.stats ?? { sandboxes: "--", runtime: "--", agents: "--" };
+  const recentTests = data?.dashboard?.recentTests ?? [];
+  const storage = data?.dashboard?.storage ?? "--";
+  const files = data?.dashboard?.files ?? "--";
 
   return (
     <div className="flex flex-col h-full animate-fade-in-up" style={{ animationDuration: '0.4s' }}>
@@ -26,20 +22,20 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard 
             title="Active Sandboxes" 
-            value={stats.sandboxes} 
+            value={loading ? "--" : stats.sandboxes} 
             subText="Manage isolated environments" 
             Icon={Box} 
           />
           <StatCard 
             title="Total Runtime" 
-            value={stats.runtime} 
+            value={loading ? "--" : stats.runtime} 
             subText="Cumulative execution time" 
             Icon={Activity} 
           />
           <StatCard 
             title="Active Agents" 
-            value={stats.agents} 
-            subText={`${storage} utilized • ${files} files`} 
+            value={loading ? "--" : stats.agents} 
+            subText={loading ? "Loading..." : `${storage} utilized • ${files} files`}
             Icon={CheckCircle2} 
             iconColor="text-emerald-500"
           />

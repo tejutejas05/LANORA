@@ -1,43 +1,57 @@
 import { useState, useEffect, useRef } from "react";
 import { X, Terminal as TerminalIcon } from "lucide-react";
 
+
+
 export default function LogTerminalModal({ run, onClose }) {
   const [logs, setLogs] = useState([]);
   const [isLive, setIsLive] = useState(true);
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    let pollingInterval;
+    const abortController = new AbortController();
 
-    const fetchRealLogs = async () => {
+    const startStreaming = async () => {
       try {
         const token = localStorage.getItem("token") || "";
-        const res = await fetch(`http://localhost:5000/api/logs/${run.id}`, {
-          headers: { "Authorization": `Bearer ${token}` }
+        const res = await fetch(`http://localhost:5000/api/test-agent-stream/${run.id}`, {
+          headers: { "Authorization": `Bearer ${token}` },
+          signal: abortController.signal
         });
         
-        if (res.ok) {
-          const data = await res.json();
-          // Extrapolates log string array from server dynamically
-          if (data.logs && data.logs.length > 0) {
-            setLogs(data.logs);
+        if (!res.ok) {
+          throw new Error("Failed to connect to log stream.");
+        }
+        
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            setIsLive(false);
+            break;
           }
-        } else {
-           setLogs(prev => prev.length === 0 ? ["[ERROR] Unable to locate backend logstream on port 5000"] : prev)
-           setIsLive(false);
+          
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n').filter(line => line.trim() !== '');
+          if (lines.length > 0) {
+            setLogs(prev => [...prev, ...lines]);
+          }
         }
       } catch (e) {
-        setLogs(prev => prev.length === 0 ? ["[ERROR] Failed to establish backend connection to logstream"] : prev)
-        setIsLive(false);
+        if (e.name !== 'AbortError') {
+          console.error("Streaming error:", e);
+          setIsLive(false);
+          setLogs(prev => [...prev, "[ERROR] Connection to live log stream failed."]);
+        }
       }
     };
 
-    // Immediately trigger fetching then poll constantly
-    fetchRealLogs();
-    pollingInterval = setInterval(fetchRealLogs, 2000);
+    startStreaming();
 
     return () => {
-      if (pollingInterval) clearInterval(pollingInterval);
+      abortController.abort();
     };
   }, [run.id]);
 
