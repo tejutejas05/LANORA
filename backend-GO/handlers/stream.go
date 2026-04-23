@@ -12,7 +12,7 @@ import (
 
 func TestAgentStream(w http.ResponseWriter, r *http.Request) {
 
-	//setup streaming 
+	//setup streaming
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
