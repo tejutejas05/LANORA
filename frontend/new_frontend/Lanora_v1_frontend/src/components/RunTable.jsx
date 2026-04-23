@@ -59,7 +59,7 @@ export default function RunTable({ runs }) {
                       onClick={() => setActiveRun(run)}
                       className="text-[11px] font-bold tracking-wider px-3 py-1.5 border border-white/10 rounded-md hover:bg-white/10 transition-colors text-white uppercase"
                     >
-                      View Log
+                      Stream Logs
                     </button>
                   </td>
                 </tr>
