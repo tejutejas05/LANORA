@@ -34,7 +34,7 @@ export default function Login() {
         },
         body: JSON.stringify({
           email:form.email,
-          password: form.passworda
+          password: form.password
         })
       });
 
