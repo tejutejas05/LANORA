@@ -34,7 +34,7 @@ export default function Login() {
         },
         body: JSON.stringify({
           email:form.email,
-          password: form.passworda
+          password: form.password
         })
       });
 
@@ -56,7 +56,6 @@ export default function Login() {
       if (!localStorage.getItem("joinDate")) {
         localStorage.setItem("joinDate", new Date().toISOString());
       }
-
       navigate("/dashboard");
     } catch(err){
       setError("server error");
