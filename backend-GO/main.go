@@ -34,7 +34,8 @@ func main() {
 		fmt.Fprintln(w, "Server is running ")
 	})
 
-	http.HandleFunc("/test-agent", middleware.VerifyJWT(handlers.TestAgent))
+	http.HandleFunc("/test-agent", middleware.VerifyJWT(handlers.TestAgent)) // for the cli
+	http.HandleFunc("/test-agent-stream", middleware.VerifyJWT(handlers.TestAgentStream)) // for the frontend
 	
 	
 

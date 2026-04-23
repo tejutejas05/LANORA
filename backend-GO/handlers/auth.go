@@ -8,6 +8,7 @@ import (
 	"time"
 
 	//"time"
+	"lanora-backend/middleware"
 
 	"github.com/golang-jwt/jwt/v5"
 
@@ -96,55 +97,56 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("Login API hit")
+    var req LoginRequest
 
-	var req LoginRequest
+    err := json.NewDecoder(r.Body).Decode(&req)
+    if err != nil {
+        http.Error(w,"Invalid input",400)
+        return
+    }
 
-	err := json.NewDecoder(r.Body).Decode(&req)  //takes json and converts to struct
-	if err != nil {
-		http.Error(w, "invalid input", 400)
-		return
-	}
+    var storedPassword string
 
-	var storePassword string
+    err = database.DB.QueryRow(
+        "SELECT password FROM users WHERE email=$1",
+        req.Email,
+    ).Scan(&storedPassword)
 
-	err = database.DB.QueryRow("SELECT password FROM users WHERE email=$1",req.Email,).Scan(&storePassword)
+    if err == sql.ErrNoRows {
+        http.Error(w,"User not found",404)
+        return
+    }
 
-	if err == sql.ErrNoRows {
-		http.Error(w, "user not Found", 404)
-		return 
-	}else if err != nil {
-		http.Error(w, "DB error", 500)
-		return
-	}
+    if err != nil {
+        http.Error(w,"DB error",500)
+        return
+    }
 
-	err = bcrypt.CompareHashAndPassword(
-		[]byte(storePassword),
-		[]byte(req.Password),
-	)
+    err = bcrypt.CompareHashAndPassword(
+        []byte(storedPassword),
+        []byte(req.Password),
+    )
 
-	if err != nil {
-		http.Error(w, "invalid password", 401)
-		return
-	}
+    if err != nil {
+        http.Error(w,"Invalid password",401)
+        return
+    }
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{		//jwt creation happens
-		"email":req.Email,
-		"exp": time.Now().Add(24 * time.Hour).Unix(),
-	})
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "email": req.Email,
+        "iat": time.Now().Unix(),
+        "exp": time.Now().Add(24*time.Hour).Unix(),
+    })
 
-	tokenString, err := token.SignedString([]byte("secret_key"))
-	if err != nil {
-		http.Error(w, "token error", 500)
-		return
-	}
+    tokenString, err := token.SignedString(middleware.SECRET_KEY)
 
-	// response := map[string]string{
-	// 	"token": tokenString,
-	// }
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": tokenString,
-	}) //sends the token to CLI/Postman
+    if err != nil {
+        http.Error(w,"Token creation failed",500)
+        return
+    }
 
+    json.NewEncoder(w).Encode(map[string]string{
+        "token": tokenString,
+    })
 }
+
