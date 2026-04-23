@@ -34,7 +34,7 @@ export default function Login() {
         },
         body: JSON.stringify({
           email:form.email,
-          password: form.password
+          password: form.passworda
         })
       });
 
@@ -46,6 +46,16 @@ export default function Login() {
       }
 
       localStorage.setItem("token", data.token);
+      
+      const username = data.username || (data.user && data.user.username) || "Developer";
+      const email = data.email || (data.user && data.user.email) || form.email;
+      
+      localStorage.setItem("username", username);
+      localStorage.setItem("email", email);
+
+      if (!localStorage.getItem("joinDate")) {
+        localStorage.setItem("joinDate", new Date().toISOString());
+      }
 
       navigate("/dashboard");
     } catch(err){

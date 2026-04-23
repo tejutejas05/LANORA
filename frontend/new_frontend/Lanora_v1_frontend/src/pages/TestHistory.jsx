@@ -1,6 +1,36 @@
-import { Search, Filter } from "lucide-react"
+import { useState } from "react"
+import { Search, Filter, Loader2 } from "lucide-react"
+import { useAppData } from "../hooks/useAppData"
+import RunTable from "../components/RunTable"
 
 export default function TestHistory() {
+  const { data, loading, error } = useAppData();
+
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("All")
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+  if (loading) {
+    return <div className="flex-1 flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>;
+  }
+  
+  if (error || !data) {
+    return <div className="p-8 text-rose-500 text-sm">{error || "Failed to load history data."}</div>;
+  }
+
+  const allTests = data.testHistory.tests;
+  // Filter logic
+  const filteredTests = allTests.filter(test => {
+    const matchesSearch = 
+      (test.agent || test.sandbox || test.name || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
+      String(test.id).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ("run-" + String(test.id)).toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesStatus = statusFilter === "All" || test.status === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
+
   return (
     <div className="flex flex-col h-full animate-fade-in-up" style={{ animationDuration: '0.4s' }}>
       <div className="flex justify-between items-start mb-8 pb-4">
@@ -9,50 +39,45 @@ export default function TestHistory() {
           <p className="text-neutral-500 text-sm mt-1">Review logs and execution results from past runs.</p>
         </div>
       </div>
-      <div className="flex gap-4 items-center mb-6">
-         <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/5 rounded-md text-sm text-neutral-400 flex-1">
-           <Search className="w-4 h-4" /> Search run ID or sandbox name...
+      
+      <div className="flex gap-4 items-center mb-6 relative">
+         <div className="flex items-center gap-2 px-3 py-2 bg-[#1a1a1a] border border-white/10 rounded-md text-sm text-white flex-1 focus-within:border-emerald-500/50 transition-colors">
+           <Search className="w-4 h-4 text-neutral-400" /> 
+           <input 
+             type="text"
+             placeholder="Search run ID or agent name..."
+             className="bg-transparent outline-none w-full placeholder:text-neutral-500"
+             value={searchTerm}
+             onChange={(e) => setSearchTerm(e.target.value)}
+           />
          </div>
-         <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/5 rounded-md text-sm text-white font-medium hover:bg-white/10 cursor-pointer transition-colors">
-           <Filter className="w-4 h-4" /> Filter
+         
+         <div className="relative">
+           <button 
+             onClick={() => setIsFilterOpen(!isFilterOpen)}
+             className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-md text-sm text-white font-medium hover:bg-white/10 transition-colors"
+           >
+             <Filter className="w-4 h-4" /> 
+             {statusFilter !== "All" ? `Filter: ${statusFilter}` : "Filter"}
+           </button>
+           
+           {isFilterOpen && (
+             <div className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-2xl z-50 p-2 animate-in fade-in zoom-in-95 duration-200">
+               {["All", "Running", "Terminated", "Success", "Error"].map(status => (
+                 <button
+                   key={status}
+                   onClick={() => { setStatusFilter(status); setIsFilterOpen(false); }}
+                   className={`w-full text-left px-3 py-2 text-sm rounded transition-colors ${statusFilter === status ? "bg-emerald-500/10 text-emerald-500 font-bold" : "text-neutral-400 hover:bg-white/5 hover:text-white"}`}
+                 >
+                   {status}
+                 </button>
+               ))}
+             </div>
+           )}
          </div>
       </div>
-      <div className="bg-[#111111] border border-white/5 rounded-xl flex-1 overflow-hidden">
-        <table className="w-full text-left text-sm whitespace-nowrap hidden md:table">
-          <thead className="bg-[#111111] border-b border-white/5 text-neutral-400 text-xs tracking-wider">
-            <tr>
-              <th className="px-6 py-4 font-medium">Run ID</th>
-              <th className="px-6 py-4 font-medium">Sandbox</th>
-              <th className="px-6 py-4 font-medium">Status</th>
-              <th className="px-6 py-4 font-medium">Duration</th>
-              <th className="px-6 py-4 font-medium">Time (Local)</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5 text-neutral-300">
-            <tr className="hover:bg-white/[0.02] cursor-default">
-              <td className="px-6 py-4 font-mono text-sm text-emerald-500 underline decoration-emerald-500/30 underline-offset-4 pointer-events-none">run-8f92j</td>
-              <td className="px-6 py-4 text-sm font-medium">agent-research</td>
-              <td className="px-6 py-4"><span className="text-amber-500 text-[10px] font-bold px-2 py-0.5 bg-amber-500/10 rounded border border-amber-500/20 inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Running</span></td>
-              <td className="px-6 py-4 text-neutral-500 text-xs">12s</td>
-              <td className="px-6 py-4 text-neutral-500 text-xs">2m ago</td>
-            </tr>
-            <tr className="hover:bg-white/[0.02] cursor-default">
-              <td className="px-6 py-4 font-mono text-sm text-emerald-500 underline decoration-emerald-500/30 underline-offset-4 pointer-events-none">run-3x8f1</td>
-              <td className="px-6 py-4 text-sm font-medium">code-assistant</td>
-              <td className="px-6 py-4"><span className="text-emerald-500 text-[10px] font-bold px-2 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 flex items-center w-fit">Success</span></td>
-              <td className="px-6 py-4 text-neutral-500 text-xs">1m 45s</td>
-              <td className="px-6 py-4 text-neutral-500 text-xs">15m ago</td>
-            </tr>
-            <tr className="hover:bg-white/[0.02] cursor-default">
-              <td className="px-6 py-4 font-mono text-sm text-emerald-500 underline decoration-emerald-500/30 underline-offset-4 pointer-events-none">run-9c2b4</td>
-              <td className="px-6 py-4 text-sm font-medium">data-pipeline</td>
-              <td className="px-6 py-4"><span className="text-rose-500 text-[10px] font-bold px-2 py-0.5 bg-rose-500/10 rounded border border-rose-500/20 flex items-center w-fit">Error</span></td>
-              <td className="px-6 py-4 text-neutral-500 text-xs">45s</td>
-              <td className="px-6 py-4 text-neutral-500 text-xs">1h ago</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      
+      <RunTable runs={filteredTests} />
     </div>
   )
 }

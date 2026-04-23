@@ -51,6 +51,10 @@ export default function Register() {
         return;
       }
       setSuccess("Account Created Successfully! Please return to CLI or Login")
+      
+      if (!localStorage.getItem("joinDate")) {
+        localStorage.setItem("joinDate", new Date().toISOString());
+      }
 
      
     
