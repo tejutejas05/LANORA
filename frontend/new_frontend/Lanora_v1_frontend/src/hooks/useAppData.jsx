@@ -1,55 +1,90 @@
 import { useState, useEffect } from "react";
 
+const BASE_URL = "http://localhost:5000/api";
+
+//  helper: fetch with JWT + timeout
+const fetchWithAuth = async (url, options = {}, timeout = 5000) => {
+  const token = localStorage.getItem("token") || "";
+
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+        ...(options.headers || {})
+      },
+      signal: controller.signal
+    });
+
+    clearTimeout(id);
+
+    if (!res.ok) {
+      throw new Error(`API failed: ${url} (${res.status})`);
+    }
+
+    return await res.json();
+  } catch (err) {
+    clearTimeout(id);
+    throw err;
+  }
+};
+
 export function useAppData() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAll = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const [dashboardRes, sandboxesRes, historyRes, resourceRes] =
-          await Promise.all([
-            fetch("http://localhost:8080/api/dashboard"),
-            fetch("http://localhost:8080/api/sandboxes"),
-            fetch("http://localhost:8080/api/history"),
-            fetch("http://localhost:8080/api/resources"),
-          ]);
+        const results = await Promise.allSettled([
+          fetchWithAuth(`${BASE_URL}/dashboard`),
+          fetchWithAuth(`${BASE_URL}/sandboxes`),
+          fetchWithAuth(`${BASE_URL}/history`),
+          fetchWithAuth(`${BASE_URL}/resources`)
+        ]);
 
-        const dashboard = await dashboardRes.json();
-        const sandboxes = await sandboxesRes.json();
-        const history = await historyRes.json();
-        const resources = await resourceRes.json();
+        //  Extract safely
+        const dashboard = results[0].status === "fulfilled" ? results[0].value : {};
+        const sandboxes = results[1].status === "fulfilled" ? results[1].value : [];
+        const history = results[2].status === "fulfilled" ? results[2].value : [];
+        const resources = results[3].status === "fulfilled" ? results[3].value : {};
 
+        //  Format for frontend (matches your components)
         const formattedData = {
           dashboard: {
             stats: {
-              sandboxes: json.active_sandboxes,
-              runtime: json.total_runtime,
-              agents: json.active_agents,
+              sandboxes: dashboard.active_sandboxes ?? "--",
+              runtime: dashboard.total_runtime ?? "--",
+              agents: dashboard.active_agents ?? "--",
             },
-            recentTests: [],
+            recentTests: history.slice(0, 5),
             storage: "--",
             files: "--",
           },
+
           sandboxes: {
             stats: {
-              created: sandboxes.length,
-              runtime: sandboxes.reduce((sum, s) => sum + s.runtime, 0),
-              storage: sandboxes.reduce((sum, s) => sum + s.storage, 0)
+              created: sandboxes.length || 0,
+              runtime: sandboxes.reduce((sum, s) => sum + (s.runtime || 0), 0),
+              storage: sandboxes.reduce((sum, s) => sum + (s.storage || 0), 0),
             },
-            history: sandboxes
+            history: sandboxes,
           },
 
           resourceUsage: {
             stats: [
-              { title: "Memory Usage", value: `${resources.memory_mb} MB` },
-              { title: "Active Runtime", value: `${resources.runtime}s` },
-              { title: "Tokens Used", value: resources.tokens },
-              { title: "GPU Usage", value: `${resources.gpu}%` }
+              { title: "Memory Usage", value: resources.memory_mb ? `${resources.memory_mb} MB` : "--" },
+              { title: "Active Runtime", value: resources.runtime ? `${resources.runtime}s` : "--" },
+              { title: "Tokens Used", value: resources.tokens ?? "--" },
+              { title: "GPU Usage", value: resources.gpu ? `${resources.gpu}%` : "--" }
             ]
           },
 
@@ -58,11 +93,17 @@ export function useAppData() {
           }
         };
 
-        console.log("Mapped Data:", formattedData);
+        console.log("Final Data:", formattedData);
         setData(formattedData);
+
+        // ⚠️ If any API failed → show warning but not break UI
+        if (results.some(r => r.status === "rejected")) {
+          setError("Some data failed to load");
+        }
+
       } catch (err) {
-        console.error(err);
-        setError("Cannot connect to backend");
+        console.error("Critical error:", err);
+        setError("Backend connection failed");
       } finally {
         setLoading(false);
       }
