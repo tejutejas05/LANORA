@@ -7,7 +7,7 @@ import RunTable from "../components/RunTable"
 export default function Dashboard() {
   const { data, loading } = useAppData();
 
-  // Safe fallback — cards always render with "--" when data is absent
+  
   const stats = data?.dashboard?.stats ?? { sandboxes: "--", runtime: "--", agents: "--" };
   const recentTests = data?.dashboard?.recentTests ?? [];
   const storage = data?.dashboard?.storage ?? "--";
