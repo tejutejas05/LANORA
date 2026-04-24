@@ -1,18 +1,19 @@
 package handlers
 
 import(
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"encoding/json"
 	"path/filepath"
-	//"lanora-backend/models"
-	"lanora-backend/services"
+	"strings"
+	"time"
 
+	"lanora-backend/services"
 )
 
-func TestAgent(w http.ResponseWriter, r *http.Request) {
+func (h *APIHandler) TestAgent(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -20,6 +21,8 @@ func TestAgent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("/test-agent hit")
+
+	db := h.DB
 
 	//parse uploaded zip
 
@@ -61,11 +64,38 @@ func TestAgent(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Zip saved at : ", filePath)
 
+	//----------------------new code ---------------------
+
+	agentName := strings.TrimSuffix(handler.Filename, ".zip")
+
+	startTime := time.Now()
+	var runID int
+
+	err = db.QueryRow(`
+		INSERT INTO agent_runs (agent_name, run_status, started_at)
+		VALUES ($1, $2, $3)
+		RETURNING id
+	`, agentName, "running", startTime).Scan(&runID)
+
+	if err != nil {
+	fmt.Println("DB ERROR:", err)   
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+	return
+}
+
 	// --------------------------jev---------------------------------
 
 	 imagename ,err := services.BuildDockerImage(filePath)
 
 	 if err != nil {
+
+		//update failed
+		db.Exec(`
+			UPDATE agent_runs
+			SET run_status=$1, finished_at=$2
+			WHERE id=$3
+		`, "failed", time.Now(), runID)
+
 		
 	 	response := map[string] interface{} {
 	 		"status": "error",
@@ -77,31 +107,58 @@ func TestAgent(w http.ResponseWriter, r *http.Request) {
 	 	return 
 	 }
 
-	//------------------------------------------------------------------------
+	//-----------------------------------------------------------
+	
+	startExec := time.Now()
 
 
 	// here i will take the logs from the running container
 
-	 logs, err := services.RunDockerContainer(imagename)
+	logs, err := services.RunDockerContainer(imagename)
 
-	 response := map[string]interface{}{}
+	endExec := time.Now()
+	runtime := int(endExec.Sub(startExec).Seconds())
 
-	 if err != nil {
+	status := "success"
+	if err != nil {
+		status = "failed"
+	}
 
-	 	response["status"] = "error"
-	 	response["stage"] = "runtime"
-	 	response["error"] = err.Error()
-	 	response["logs"] = logs
-	 } else {
-	 	response["status"] = "success"
-	 	response["logs"] = logs
-	 }
+	// ------------------ UPDATE: agent_runs ------------------
 
-	 w.Header().Set(
-	 	"Content-Type",
-	 	"application/json",
-	 )
+	db.Exec(`
+		UPDATE agent_runs
+		SET run_status=$1, finished_at=$2
+		WHERE id=$3
+	`, status, endExec, runID)
 
+	// ------------------ INSERT: sandboxes ------------------
+
+	db.Exec(`
+		INSERT INTO sandboxes (name, status, runtime_seconds, storage_mb)
+		VALUES ($1, $2, $3, $4)
+	`, agentName, status, runtime, 200)
+
+	// ------------------ INSERT: resource_usage ------------------
+
+	db.Exec(`
+		INSERT INTO resource_usage (memory_mb, token_count, gpu_percent, runtime_seconds)
+		VALUES ($1, $2, $3, $4)
+	`, 512, 1000, 20, runtime)
+
+	// ------------------ Final Response ------------------
+
+	response := map[string]interface{}{
+		"status": status,
+		"logs":   logs,
+	}
+
+	if err != nil {
+		response["stage"] = "runtime"
+		response["error"] = err.Error()
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 
 }
