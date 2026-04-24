@@ -37,7 +37,20 @@ func main() {
 	http.HandleFunc("/test-agent", middleware.VerifyJWT(handlers.TestAgent)) // for the cli
 	http.HandleFunc("/test-agent-stream", middleware.VerifyJWT(handlers.TestAgentStream)) // for the frontend
 	
-	
+	// // api call 
+	// http.HandleFunc("/api/dashboard", middleware.VerifyJWT(handlers.DashboardHandler))
+	// http.HandleFunc("/api/sandboxes", middleware.VerifyJWT(handlers.SandboxersHandler))
+	// http.HandleFunc("/api/history", middleware.VerifyJWT(handlers.historyHandler))
+	// http.HandleFunc("/api/resources", middleware.VerifyJWT(handlers.resourcesHandler))
+
+	api := &handlers.APIHandler{DB: database.DB}
+
+	http.HandleFunc("/api/dashboard", api.DashboardHandler)
+	http.HandleFunc("/api/sandboxes", api.SandboxesHandler)
+	http.HandleFunc("/api/history", api.HistoryHandler)
+	http.HandleFunc("/api/resources", api.ResourcesHandler)
+
+
 
 	//  IMPORTANT ROUTE
 	http.HandleFunc("/register", handlers.Register)
