@@ -4,6 +4,68 @@ import requests # for the http requests to backend
 from lanora.utils import require_auth
 
 
+def is_interactive(project_path):
+    main_file = os.path.join(project_path, "main.py")
+
+    with open(main_file, "r") as f:
+        code = f.read()
+
+    return "input(" in code
+
+
+
+def run_normal_test(zip_name, token):
+    print("Running in normal mode...")
+
+    url = "http://localhost:5000/test-agent"
+
+    with open(zip_name, "rb") as f:
+        files = {"file": f}
+
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+
+        response = requests.post(url, files=files, headers=headers)
+
+    print("Response from server:")
+    print(response.text)
+
+def run_interactive_test(zip_name, token):
+    print("Running in interactive mode...")
+
+    import websocket
+    import threading
+
+    ws = websocket.WebSocket()
+    ws.connect(
+        "ws://localhost:5000/ws/test-agent",
+        header=[f"Authorization: Bearer {token}"]
+    )
+
+    with open(zip_name, "rb") as f:
+        ws.send_binary(f.read())
+
+    def receive():
+        while True:
+            try:
+                output = ws.recv()
+                print(output, end="")
+            except:
+                break
+
+    threading.Thread(target=receive, daemon=True).start()
+
+    while True:
+        try:
+            user_input = input()
+            ws.send(user_input)
+        except KeyboardInterrupt:
+            print("\nStopping...")
+            ws.close()
+            break
+
+
 @require_auth
 def run_test(token):
 
@@ -49,27 +111,11 @@ def run_test(token):
 
     print("file sending to backend")
 
-    url = "http://localhost:5000/test-agent"
-
-    try:
-        with open(zip_name, "rb") as f: # open zip file
-            files = {"file": f}
-
-            #new line code for token auth(jwt)
-            headers = {
-                "Authorization":f"Bearer {token}"
-            }
-
-            response = requests.post(url, files=files, headers=headers) # http request 
-
-        print("Response from server:")
-        print(response.text)
-    
-    # if fails this works
-    except Exception as e: 
-        print("Failed to connect")
-        print(e)
-
+    #  DECIDE MODE
+    if is_interactive(project_path):
+        run_interactive_test(zip_name, token)
+    else:
+        run_normal_test(zip_name, token)
 
 @require_auth    
 def run_deploy(token):
