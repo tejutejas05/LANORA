@@ -52,6 +52,10 @@ func main() {
 	// CLI compatibility
 	http.HandleFunc("/test-agent", middleware.VerifyJWT(api.TestAgent))
 
+	// interactive
+	//http.HandleFunc("/ws/test-agent", middleware.VerifyJWT(handlers.TestAgentWS))
+	http.HandleFunc("/ws/test-agent", handlers.TestAgentWS)
+
 	// ---------------- DASHBOARD APIs ----------------
 	http.HandleFunc("/api/dashboard", middleware.VerifyJWT(api.DashboardHandler))
 	http.HandleFunc("/api/sandboxes", middleware.VerifyJWT(api.SandboxesHandler))
