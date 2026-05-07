@@ -3,7 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strconv"
+	"strings"
 )
 
 type APIHandler struct{
@@ -135,6 +140,32 @@ func (h *APIHandler) ResourcesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(usage)
 }
 
+
+// agent proxy
+
+func (h *APIHandler) AgentProxy(w http.ResponseWriter, r *http.Request) {
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/agent/")
+	id, _ := strconv.Atoi(idStr)
+
+	var port int
+
+	err := h.DB.QueryRow(`
+		SELECT port FROM agent_runs WHERE id=$1
+	`, id).Scan(&port)
+
+	if err != nil {
+		http.Error(w, "Agent not found", 404)
+		return
+	}
+
+	target := fmt.Sprintf("http://localhost:%d", port)
+
+	url, _ := url.Parse(target)
+	proxy := httputil.NewSingleHostReverseProxy(url)
+
+	proxy.ServeHTTP(w, r)
+}
 
 
 

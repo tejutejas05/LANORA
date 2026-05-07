@@ -1,6 +1,6 @@
 import argparse
 from lanora.auth import login, register, logout
-from lanora.commands.test import run_test
+from lanora.commands.test import run_test, run_deploy
 import sys
 
 public_commands = ["login", "register"]
@@ -24,8 +24,8 @@ def main():
     elif cmd == "test":
         run_test()
 
-    #elif cmd == "deploy":
-    #   deploy.run()
+    elif cmd == "deploy":
+       run_deploy()
 
     else:
         print("Unknown command")
